@@ -33,25 +33,32 @@ int main (){
   //VARIAVEIS DE POSIÇÂO E FPS (CASO ANIMAÇÂO COM VARIOS SPRITES)
   //float frame = 0.f;
   //int posicao_ini_sprite = 161;
-  int pos_x = 0, pos_y = 0;
+  int pos_x = 0, pos_y = 500;
 
   
 
   while(true){
-    ALLEGRO_EVENT event;
+    ALLEGRO_EVENT event;   
     al_wait_for_event(event_queue, &event);
-    if( event.type == ALLEGRO_EVENT_DISPLAY_CLOSE ){
+    if( event.type == ALLEGRO_EVENT_DISPLAY_CLOSE ){ 
       break;
+    }else if (event.keyboard.keycode == ALLEGRO_KEY_RIGHT) {
+        pos_x += 20;
     }
-
-    al_clear_to_color(al_map_rgb(255,255,255));
+    else if (event.keyboard.keycode == ALLEGRO_KEY_LEFT) {
+        pos_x -= 20;
+    }
+    al_clear_to_color(al_map_rgb(255, 255, 255));
     al_draw_text(font, al_map_rgb(0, 0, 0), 10, 10, 0, "SCORE:");
+    al_draw_text(font, al_map_rgb(255, 255, 255), 9, 9, 0, "SCORE:");
+    al_draw_bitmap(sprit, pos_x, pos_y,0);
     al_flip_display();
   }
 
   al_destroy_font(font);
   al_destroy_display(display);
   al_destroy_event_queue(event_queue);
+  al_destroy_bitmap(sprit);
 
   return 0;
 }
