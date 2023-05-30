@@ -9,6 +9,14 @@
 #include <time.h>
 
 
+
+
+typedef struct {
+    int pos_x;
+    int pos_y;
+    bool queda;
+}varias_torres;
+
 ALLEGRO_DISPLAY* inicia_display(); 
 ALLEGRO_EVENT_QUEUE* inicia_event_queue(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER* timer);
 void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, int pos_x, int pos_y);
@@ -33,7 +41,7 @@ int main (){
 
   // LOAD ASSETS // Declarando assets e carregando para uma variavel
   ALLEGRO_FONT* font = al_load_font("./Assets/font.ttf",15,0);
-  ALLEGRO_TIMER* timer = al_create_timer(1.0 / 15.0);
+  ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
   ALLEGRO_BITMAP* sprit = al_load_bitmap("./Assets/Tower.png");
   ALLEGRO_BITMAP* sprit_inimigo = al_load_bitmap("./Assets/enemy_tower.png");
 
@@ -73,17 +81,19 @@ ALLEGRO_EVENT_QUEUE* inicia_event_queue(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER*
 
 void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int *pos_x, int *pos_y, ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* sprit_inimigo) {
     ALLEGRO_EVENT event;
-    int y = 100, x = pozicione_naoaliado();
+    int y = -50, x = pozicione_naoaliado();
     do {
         al_wait_for_event(event_queue, &event);
         desenha_tela(font, sprit, *pos_x, *pos_y);
         desenha_inimigo(sprit_inimigo, x, y);
-        y += 10;
+        y += 8;
         if (y > 500){
             x = pozicione_naoaliado();
-            y = 100;
+            y = -50;
         }
         
+
+
         
         switch (event.keyboard.keycode)
         {
