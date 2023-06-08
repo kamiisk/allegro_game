@@ -9,13 +9,14 @@
 #include <time.h>
 
 
-
+#define NUN_TORRE 2
 
 typedef struct {
     int pos_x;
     int pos_y;
     bool queda;
-}varias_torres;
+    float tempo_queda;
+}Torre;
 
 ALLEGRO_DISPLAY* inicia_display(); 
 ALLEGRO_EVENT_QUEUE* inicia_event_queue(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER* timer);
@@ -81,20 +82,39 @@ ALLEGRO_EVENT_QUEUE* inicia_event_queue(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER*
 
 void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int *pos_x, int *pos_y, ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* sprit_inimigo) {
     ALLEGRO_EVENT event;
-    int y = -50, x = pozicione_naoaliado();
+    Torre torres[NUN_TORRE]; // Array de torres
+
+    for (int i = 0; i < NUN_TORRE; i++) {
+        torres[i].pos_x = pozicione_naoaliado();
+        torres[i].pos_y = -50;
+        torres[i].queda = false;
+        torres[i].tempo_queda = 0.0;
+    }
+
+
     do {
         al_wait_for_event(event_queue, &event);
         desenha_tela(font, sprit, *pos_x, *pos_y);
-        desenha_inimigo(sprit_inimigo, x, y);
-        y += 8;
-        if (y > 500){
-            x = pozicione_naoaliado();
-            y = -50;
+
+        for (int i = 0; i < NUN_TORRE; i++) {
+            desenha_inimigo(sprit_inimigo, torres[i].pos_x, torres[i].pos_y);
+
+            if (!torres[i].queda) {
+                torres[i].tempo_queda += 10.0 / 30.0; // Incrementa o tempo de queda para cada torre
+
+                if (torres[i].tempo_queda >= i + 1) {
+                    torres[i].pos_y += 15;
+
+                    if (torres[i].pos_y > 500) {
+                        torres[i].pos_x = pozicione_naoaliado();
+                        torres[i].pos_y = -50;
+                        torres[i].queda = false;
+                    }
+
+                    torres[i].tempo_queda = 0; // Reinicia o tempo de queda para a próxima queda
+                }
+            }
         }
-        
-
-
-        
         switch (event.keyboard.keycode)
         {
             case ALLEGRO_KEY_RIGHT:
