@@ -1,164 +1,115 @@
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/keyboard.h>
-#include <allegro5/allegro_primitives.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include "menu.h""
+#include "functions.h"
+#include "game.h"
 
-
-#define NUN_TORRE 2
-
-typedef struct {
-    int pos_x;
-    int pos_y;
-    bool queda;
-    float tempo_queda;
-}Torre;
-
-ALLEGRO_DISPLAY* inicia_display(); 
-ALLEGRO_EVENT_QUEUE* inicia_event_queue(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER* timer);
-void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, int pos_x, int pos_y);
-void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int* pos_x, int* pos_y, ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* sprit_inimigo);
-void limpeza_divina(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* event_queue);
-void desenha_inimigo(ALLEGRO_BITMAP* sprit, int pos_x, int pos_y);
-int pozicione_naoaliado();
-void inicializa_aleatorio();
-
-int main (){
-  //Inicia a biblioteca e todas as dependencias que vão ser usadas
-  al_init();
-  al_init_font_addon();
-  al_init_ttf_addon();
-  al_init_image_addon();
-  al_install_keyboard();
-  al_init_primitives_addon();
-
-
-  //DISPLAY//
-  ALLEGRO_DISPLAY* display = inicia_display();
-
-  // LOAD ASSETS // Declarando assets e carregando para uma variavel
-  ALLEGRO_FONT* font = al_load_font("./Assets/font.ttf",15,0);
-  ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
-  ALLEGRO_BITMAP* sprit = al_load_bitmap("./Assets/Tower.png");
-  ALLEGRO_BITMAP* sprit_inimigo = al_load_bitmap("./Assets/enemy_tower.png");
-
-  //Verificador de eventos todos os eventos tem que passar por aqui
-  ALLEGRO_EVENT_QUEUE* event_queue = inicia_event_queue(display, timer);
-  al_start_timer(timer);
-
-  //VARIAVEIS DE POSIÇÂO E FPS (CASO ANIMAÇÂO COM VARIOS SPRITES)
-  //float frame = 0.f;
-  //int posicao_ini_sprite = 161;
-  int pos_x = 0, pos_y = 500;
-
-  ver_eventos(event_queue, &pos_x, &pos_y, font, sprit, sprit_inimigo);
-
-  limpeza_divina(font, sprit, display, event_queue);
-
-  return 0;
-}
-
-ALLEGRO_DISPLAY* inicia_display() {
-    ALLEGRO_DISPLAY* display = al_create_display(800, 600);
-    al_set_window_position(display, 200, 200);
-    al_set_window_title(display, "CloneGame");
-
-    return display;
-}
-
-ALLEGRO_EVENT_QUEUE* inicia_event_queue(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER* timer) {
-    ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
-    al_register_event_source(event_queue, al_get_display_event_source(display));
-    al_register_event_source(event_queue, al_get_timer_event_source(timer));
-    al_register_event_source(event_queue, al_get_keyboard_event_source());
-
-    return event_queue;
-} 
-
-
-void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int *pos_x, int *pos_y, ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* sprit_inimigo) {
-    ALLEGRO_EVENT event;
-    Torre torres[NUN_TORRE]; // Array de torres
-
-    for (int i = 0; i < NUN_TORRE; i++) {
-        torres[i].pos_x = pozicione_naoaliado();
-        torres[i].pos_y = -50;
-        torres[i].queda = false;
-        torres[i].tempo_queda = 0.0;
+int main() {
+    // Inicia a biblioteca e todas as dependências que serão usadas
+    if (!al_init()) {
+        fprintf(stderr, "Falha ao inicializar a biblioteca Allegro.\n");
+        return 1;
     }
+    printf("Biblioteca Allegro inicializada com sucesso.\n");
 
+    if (!al_init_font_addon()) {
+        fprintf(stderr, "Falha ao inicializar o addon de fonte da Allegro.\n");
+        return 1;
+    }
+    printf("Addon de fonte da Allegro inicializado com sucesso.\n");
 
-    do {
-        al_wait_for_event(event_queue, &event);
-        desenha_tela(font, sprit, *pos_x, *pos_y);
+    if (!al_init_ttf_addon()) {
+        fprintf(stderr, "Falha ao inicializar o addon TrueType Font da Allegro.\n");
+        return 1;
+    }
+    printf("Addon TrueType Font da Allegro inicializado com sucesso.\n");
 
-        for (int i = 0; i < NUN_TORRE; i++) {
-            desenha_inimigo(sprit_inimigo, torres[i].pos_x, torres[i].pos_y);
+    if (!al_init_image_addon()) {
+        fprintf(stderr, "Falha ao inicializar o addon de imagem da Allegro.\n");
+        return 1;
+    }
+    printf("Addon de imagem da Allegro inicializado com sucesso.\n");
 
-            if (!torres[i].queda) {
-                torres[i].tempo_queda += 10.0 / 30.0; // Incrementa o tempo de queda para cada torre
+    if (!al_install_keyboard()) {
+        fprintf(stderr, "Falha ao instalar o teclado da Allegro.\n");
+        return 1;
+    }
+    printf("Teclado da Allegro instalado com sucesso.\n");
 
-                if (torres[i].tempo_queda >= i + 1) {
-                    torres[i].pos_y += 15;
+    if (!al_init_primitives_addon()) {
+        fprintf(stderr, "Falha ao inicializar o addon de primitivas da Allegro.\n");
+        return 1;
+    }
+    printf("Addon de primitivas da Allegro inicializado com sucesso.\n");
 
-                    if (torres[i].pos_y > 500) {
-                        torres[i].pos_x = pozicione_naoaliado();
-                        torres[i].pos_y = -50;
-                        torres[i].queda = false;
-                    }
+    // DISPLAY
+    ALLEGRO_DISPLAY* display = inicia_display();
+    if (!display) {
+        fprintf(stderr, "Falha ao criar o display da Allegro.\n");
+        return 1;
+    }
+    printf("Display criado com sucesso.\n");
 
-                    torres[i].tempo_queda = 0; // Reinicia o tempo de queda para a próxima queda
-                }
-            }
-        }
-        switch (event.keyboard.keycode)
-        {
-            case ALLEGRO_KEY_RIGHT:
-                if(*pos_x<740)
-                    *pos_x += 20;
-            break;
-            case ALLEGRO_KEY_LEFT:
-                if(*pos_x > 0)
-                    *pos_x -= 20;
-            break;
-            default:
-                break;
-        }
-    } while (event.type != ALLEGRO_EVENT_DISPLAY_CLOSE);
-}
+    // LOAD ASSETS
+    ALLEGRO_FONT* font = al_load_font("./Assets/font.ttf", 15, 0);
+    if (!font) {
+        fprintf(stderr, "Falha ao carregar a fonte.\n");
+        al_destroy_display(display);
+        return 1;
+    }
+    printf("Fonte carregada com sucesso.\n");
 
-void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, int pos_x, int pos_y) {
-    al_clear_to_color(al_map_rgb(255, 255, 255));
-    al_draw_text(font, al_map_rgb(0, 0, 0), 10, 10, 0, "SCORE:");
-    al_draw_text(font, al_map_rgb(255, 255, 255), 9, 9, 0, "SCORE:");
-    al_draw_bitmap(sprit, pos_x, pos_y, 0);
-    al_flip_display();
-}
+    ALLEGRO_TIMER* timer = al_create_timer(1.0 / 30.0);
+    if (!timer) {
+        fprintf(stderr, "Falha ao criar o timer da Allegro.\n");
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return 1;
+    }
+    printf("Timer criado com sucesso.\n");
 
-void limpeza_divina(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* event_queue){
-    al_destroy_font(font);
-    al_destroy_display(display);
-    al_destroy_event_queue(event_queue);
-    al_destroy_bitmap(sprit);
-}
+    ALLEGRO_BITMAP* sprit = al_load_bitmap("./Assets/Tower.png");
+    if (!sprit) {
+        fprintf(stderr, "Falha ao carregar o bitmap da torre.\n");
+        al_destroy_timer(timer);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return 1;
+    }
+    printf("Bitmap da torre carregado com sucesso.\n");
 
-void desenha_inimigo(ALLEGRO_BITMAP* sprit, int pos_x, int pos_y) {
+    ALLEGRO_BITMAP* sprit_inimigo = al_load_bitmap("./Assets/enemy_tower.png");
+    if (!sprit_inimigo) {
+        fprintf(stderr, "Falha ao carregar o bitmap da torre inimiga.\n");
+        al_destroy_bitmap(sprit);
+        al_destroy_timer(timer);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return 1;
+    }
+    printf("Bitmap da torre inimiga carregado com sucesso.\n");
 
-    al_draw_bitmap(sprit, pos_x, pos_y, 0);
-    al_flip_display();
-}
+    // Verificador de eventos - todos os eventos têm que passar por aqui
+    ALLEGRO_EVENT_QUEUE* event_queue = inicia_event_queue(display, timer);
+    if (!event_queue) {
+        fprintf(stderr, "Falha ao criar a fila de eventos da Allegro.\n");
+        al_destroy_bitmap(sprit_inimigo);
+        al_destroy_bitmap(sprit);
+        al_destroy_timer(timer);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return 1;
+    }
+    printf("Fila de eventos criada com sucesso.\n");
 
-int pozicione_naoaliado() {
-   
-    int x = rand() % 730;
-    printf("%d\n", x);
-    return x;
-} 
+    al_start_timer(timer);
 
-void inicializa_aleatorio() {
-    srand(time(NULL));
+    int score = 0;
+    menu_inicial(font, display, event_queue);
+
+    int pos_x = 0, pos_y = 500;
+
+    ver_eventos(event_queue, &pos_x, &pos_y, font, sprit, sprit_inimigo, &score);
+
+    limpeza_divina(font, sprit, display, event_queue);
+
+    return 0;
 }
