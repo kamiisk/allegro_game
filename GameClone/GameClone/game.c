@@ -4,6 +4,7 @@ typedef struct {
     int pos_x;
     int pos_y;
     bool queda;
+    bool visivel;
     //float tempo_queda;
 }Torre;
 
@@ -11,7 +12,7 @@ void incrementa_score(int* score) {
     (*score)++;
 }
 
-void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int* pos_x, int* pos_y, ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* sprit_inimigo, int* score) {
+void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int* pos_x, int* pos_y, ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* sprit_inimigo, ALLEGRO_BITMAP* fundo, int* score) {
     ALLEGRO_EVENT event;
     // Torre torre[NUN_TORRE]; // Array de torres
     Torre torre;
@@ -19,11 +20,13 @@ void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int* pos_x, int* pos_y, ALLEG
     torre.pos_x = pozicione_naoaliado();
     torre.pos_y = -50;
     torre.queda = false;
+    torre.visivel = true;
     //torre.tempo_queda = 0.15;
 
     float velocidade = 15;
     int num_torres = 0;
     bool colidiu = false;
+    
 
     bool move_left = false;
     bool move_right = false;
@@ -55,8 +58,8 @@ void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int* pos_x, int* pos_y, ALLEG
                 break;
             }
         }
-
-        desenha_tela(font, sprit, *pos_x, *pos_y, *score);
+       
+        desenha_tela(font, sprit,fundo, *pos_x, *pos_y, *score);
         desenha_inimigo(sprit_inimigo, torre.pos_x, torre.pos_y);
 
         if (torre.pos_y > 500) {
@@ -67,9 +70,12 @@ void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int* pos_x, int* pos_y, ALLEG
             if (colidiu) {
                 incrementa_score(score);
                 colidiu = false;
+                torre.visivel = false;
             }
         }
-
+        if (torre.visivel) {
+            desenha_inimigo(sprit_inimigo, torre.pos_x, torre.pos_y);
+        }
 
         float pos_player = *pos_x;
         float pos_torre_inimiga = torre.pos_x;
@@ -80,15 +86,15 @@ void ver_eventos(ALLEGRO_EVENT_QUEUE* event_queue, int* pos_x, int* pos_y, ALLEG
  
         switch (num_torres) {
         case 3:
-            velocidade = 8;
+            velocidade = 5;
             break;
 
-        case 15:
+        case 10:
             velocidade = 15;
             break;
 
-        case 25:
-            velocidade = 25;
+        case 20:
+            velocidade = 20;
             break;
 
         default:

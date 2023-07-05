@@ -49,8 +49,8 @@ void menu_inicial(ALLEGRO_FONT* font, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QU
 
         al_clear_to_color(al_map_rgb(0, 0, 0));
         al_draw_text(font, (selecionado == 0) ? al_map_rgb(255, 255, 255) : al_map_rgb(128, 128, 128), 400, 300 - 80, ALLEGRO_ALIGN_CENTER, "Jogar");
-        al_draw_text(font, (selecionado == 1) ? al_map_rgb(255, 255, 255) : al_map_rgb(128, 128, 128), 400, 300 - 40, ALLEGRO_ALIGN_CENTER, "score");
-        al_draw_text(font, (selecionado == 2) ? al_map_rgb(255, 255, 255) : al_map_rgb(128, 128, 128), 400, 300, ALLEGRO_ALIGN_CENTER, "som");
+        al_draw_text(font, (selecionado == 1) ? al_map_rgb(255, 255, 255) : al_map_rgb(128, 128, 128), 400, 300 - 40, ALLEGRO_ALIGN_CENTER, "som");
+        al_draw_text(font, (selecionado == 2) ? al_map_rgb(255, 255, 255) : al_map_rgb(128, 128, 128), 400, 300, ALLEGRO_ALIGN_CENTER, "Manual Anti-Burro");
         al_draw_text(font, (selecionado == 3) ? al_map_rgb(255, 255, 255) : al_map_rgb(128, 128, 128), 400, 300 + 40, ALLEGRO_ALIGN_CENTER, "Sair");
         al_flip_display();
     }

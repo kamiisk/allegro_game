@@ -5,8 +5,8 @@
 
 ALLEGRO_DISPLAY* inicia_display();
 ALLEGRO_EVENT_QUEUE* inicia_event_queue(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER* timer);
-void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, int pos_x, int pos_y, int score);
-void limpeza_divina(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* event_queue);
+void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* fundo, int pos_x, int pos_y, int score);
+void limpeza_divina(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* fundo, ALLEGRO_BITMAP* sprit_inimigo, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* event_queue);
 void desenha_inimigo(ALLEGRO_BITMAP* sprit, int pos_x, int pos_y);
 int pozicione_naoaliado();
 void inicializa_aleatorio();
@@ -37,10 +37,13 @@ ALLEGRO_EVENT_QUEUE* inicia_event_queue(ALLEGRO_DISPLAY* display, ALLEGRO_TIMER*
     return event_queue;
 }
 
-void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, int pos_x, int pos_y,  int score) {
+void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* fundo, int pos_x, int pos_y,  int score) {
     al_clear_to_color(al_map_rgb(255, 255, 255));
-
+    al_draw_bitmap(fundo, 0, 0, 0);
     // Desenha o grid
+
+/*
+    
     for (int x = 0; x < 800; x += 25) {
         al_draw_line(x, 0, x, 600, al_map_rgb(200, 200, 200), 1);
     }
@@ -48,7 +51,10 @@ void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, int pos_x, int pos_
     for (int y = 0; y < 600; y += 25) {
         al_draw_line(0, y, 800, y, al_map_rgb(200, 200, 200), 1);
     }
+    */
+    
     ////////////////////////////////////////////////////////////////////////
+    
     char score_text[20];
     snprintf(score_text, sizeof(score_text), "SCORE: %d", score);
 
@@ -64,7 +70,6 @@ void desenha_tela(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, int pos_x, int pos_
 bool verifica_colisao(int x1, int y1, int largura1, int altura1, int x2, int y2, int largura2, int altura2) {
     // Verifica se ocorre colisão nas coordenadas X
     bool colisaoX = x1 + largura1 >= x2 && x2 + largura2 >= x1;
-
     // Verifica se ocorre colisão nas coordenadas Y
     bool colisaoY = y1 + altura1 >= y2 && y2 + altura2 >= y1;
 
@@ -74,12 +79,15 @@ bool verifica_colisao(int x1, int y1, int largura1, int altura1, int x2, int y2,
 
 
 
-void limpeza_divina(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* event_queue) {
+void limpeza_divina(ALLEGRO_FONT* font, ALLEGRO_BITMAP* sprit, ALLEGRO_BITMAP* fundo, ALLEGRO_BITMAP* sprit_inimigo, ALLEGRO_DISPLAY* display, ALLEGRO_EVENT_QUEUE* event_queue) {
     al_destroy_font(font);
     al_destroy_display(display);
     al_destroy_event_queue(event_queue);
     al_destroy_bitmap(sprit);
+    al_destroy_bitmap(sprit_inimigo);
+    al_destroy_bitmap(fundo);
 }
+
 
 void desenha_inimigo(ALLEGRO_BITMAP* sprit, int pos_x, int pos_y) {
     al_draw_bitmap(sprit, pos_x, pos_y, 0);

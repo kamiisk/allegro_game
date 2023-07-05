@@ -66,6 +66,16 @@ int main() {
     }
     printf("Timer criado com sucesso.\n");
 
+    ALLEGRO_BITMAP* fundo = al_load_bitmap("./Assets/background_torres.png");
+    if (!fundo) {
+        fprintf(stderr, "Falha ao carregar a imagem de fundo.\n");
+        al_destroy_timer(timer);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return 1;
+    }
+    printf("Bitmap do background carregado com sucesso.\n");
+
     ALLEGRO_BITMAP* sprit = al_load_bitmap("./Assets/Tower.png");
     if (!sprit) {
         fprintf(stderr, "Falha ao carregar o bitmap da torre.\n");
@@ -76,7 +86,7 @@ int main() {
     }
     printf("Bitmap da torre carregado com sucesso.\n");
 
-    ALLEGRO_BITMAP* sprit_inimigo = al_load_bitmap("./Assets/enemy_tower.png");
+    ALLEGRO_BITMAP* sprit_inimigo = al_load_bitmap("./Assets/invertedpawn.png");
     if (!sprit_inimigo) {
         fprintf(stderr, "Falha ao carregar o bitmap da torre inimiga.\n");
         al_destroy_bitmap(sprit);
@@ -107,9 +117,9 @@ int main() {
 
     int pos_x = 0, pos_y = 500;
 
-    ver_eventos(event_queue, &pos_x, &pos_y, font, sprit, sprit_inimigo, &score);
+    ver_eventos(event_queue, &pos_x, &pos_y, font, sprit, sprit_inimigo,fundo , &score);
 
-    limpeza_divina(font, sprit, display, event_queue);
+    limpeza_divina(font, sprit,sprit_inimigo,fundo, display, event_queue);
 
     return 0;
 }
